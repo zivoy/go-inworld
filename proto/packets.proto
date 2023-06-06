@@ -1,0 +1,232 @@
+syntax = "proto3";
+package ai.inworld.packets;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+message Actor {
+  Type type = 1;
+  string name = 2;
+
+  enum Type {
+    UNKNOWN = 0;
+    PLAYER = 1;
+    AGENT = 2;
+  }
+}
+
+message Routing {
+  optional Actor source = 1;
+  optional Actor target = 2;
+}
+
+message PacketId {
+  string packetId = 1;
+  string utteranceId = 2;
+  string interactionId = 3;
+}
+
+message InworldPacket {
+  optional google.protobuf.Timestamp timestamp = 1;
+  optional Routing routing = 6;
+  string oldPacketId = 7;
+  optional PacketId packetId = 9;
+
+  oneof Packet {
+    TextEvent text = 2;
+    ControlEvent control = 3;
+    AudioChunk audioChunk = 4 ;
+    GestureEvent gesture = 5;
+    CustomEvent custom = 8;
+    CancelResponsesEvent cancelresponses = 10 ;
+    EmotionEvent emotion = 11;
+    DataChunk dataChunk = 12;
+    ActionEvent action = 13;
+    MutationEvent mutation = 15;
+    LoadSceneOutputEvent loadSceneOutput = 16;
+  }
+}
+
+message TextEvent {
+  string text = 1;
+  SourceType sourceType = 2;
+  bool pb_final = 3;
+
+  enum SourceType {
+    UNKNOWN = 0;
+    SPEECH_TO_TEXT = 1;
+    TYPED_IN = 2;
+    GENERATED = 3;
+    FILLER = 4;
+  }
+}
+
+message ControlEvent {
+  Action action = 1;
+  string description = 2;
+  optional google.protobuf.Struct payload = 3;
+
+  enum Action {
+    UNKNOWN = 0;
+    AUDIO_SESSION_START = 1;
+    AUDIO_SESSION_END = 2;
+    INTERACTION_END = 3;
+    TTS_PLAYBACK_START = 4;
+    TTS_PLAYBACK_END = 5;
+    TTS_PLAYBACK_MUTE = 6;
+    TTS_PLAYBACK_UNMUTE = 7;
+    WARNING = 8;
+    SESSION_END = 9;
+  }
+}
+
+message AudioChunk {
+  bytes chunk = 1;
+}
+
+message GestureEvent {
+  Type type = 1;
+  Playback playback = 2;
+
+  enum Type {
+    GREETING = 0;
+    FAREWELL = 1;
+    AGREEMENT = 2;
+    DISAGREEMENT = 3;
+    GRATITUDE = 4;
+    CELEBRATION = 5;
+    BOREDOM = 6;
+    UNCERTAINTY = 7;
+  }
+}
+
+message CustomEvent {
+  string name = 1;
+  Playback playback = 2;
+  repeated Parameter parametersList = 3;
+
+  message Parameter {
+    string name = 1;
+    string value = 2;
+  }
+}
+
+message CancelResponsesEvent {
+  string interactionId = 1;
+  repeated string utteranceIdList = 2;
+}
+
+message EmotionEvent {
+  float joy = 1;
+  float fear = 2;
+  float trust = 3;
+  float surprise = 4;
+  SpaffCode behavior = 5;
+  Strength strength = 6;
+
+  enum SpaffCode {
+    NEUTRAL = 0;
+    DISGUST = 1;
+    CONTEMPT = 2;
+    BELLIGERENCE = 3;
+    DOMINEERING = 4;
+    CRITICISM = 5;
+    ANGER = 6;
+    TENSION = 7;
+    TENSE_HUMOR = 8;
+    DEFENSIVENESS = 9;
+    WHINING = 10;
+    SADNESS = 11;
+    STONEWALLING = 12;
+    INTEREST = 13;
+    VALIDATION = 14;
+    AFFECTION = 15;
+    HUMOR = 16;
+    SURPRISE = 17;
+    JOY = 18;
+  }
+
+  enum Strength {
+    UNSPECIFIED = 0;
+    WEAK = 1;
+    STRONG = 2;
+    NORMAL = 3;
+  }
+}
+
+message DataChunk {
+  oneof Data {
+    bytes chunk = 1;
+    int64 durationMs = 3;
+  }// these dident have optional but i think they ware in a oneof
+  DataType type = 2;
+  repeated AdditionalPhonemeInfo additionalPhonemeInfoList = 4;
+
+  enum DataType {
+    UNSPECIFIED = 0;
+    AUDIO = 1;
+    ANIMATION = 2;
+    SILENCE = 3;
+    STATE = 4;
+  }
+}
+
+message AdditionalPhonemeInfo {
+  string phoneme = 1;
+  optional google.protobuf.Duration startOffset = 2;
+}
+
+message ActionEvent {
+  oneof Action {// this should can be an optional
+    NarratedAction narratedAction = 1;
+  }
+  Playback playback = 2;
+}
+
+message NarratedAction {
+  string content = 1;
+}
+
+message MutationEvent {
+  oneof Mutation{
+    CancelResponses cancelResponses = 1;
+    RegenerateResponse regenerateResponse = 2;
+    ApplyResponse applyResponse = 3;
+    LoadScene loadScene = 4;
+  }
+}
+
+message CancelResponses {
+  string interactionId = 1;
+  repeated string utteranceIdList = 2;
+}
+
+message RegenerateResponse {
+  string interactionId = 1;
+}
+
+message ApplyResponse {
+  optional PacketId packetId = 1;
+}
+
+message LoadScene {
+  string name = 1;
+}
+
+message LoadSceneOutputEvent {
+  repeated Agent agentsList = 1;
+
+  message Agent {
+    string agentId = 1;
+    string brainName = 2;
+    string givenName = 3;
+  }
+}
+
+enum Playback {
+  UNSPECIFIED = 0;
+  INTERACTION = 1;
+  INTERACTION_END = 2;
+  UTTERANCE = 3;
+}

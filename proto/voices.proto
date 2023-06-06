@@ -1,0 +1,23 @@
+syntax = "proto3";
+package ai.inworld.voices;
+
+message Voice {
+  string basename = 1;
+  TTSType ttsType = 2;
+  Gender gender = 3;
+  double pitch = 4;
+  double speakingRate = 5;
+  double roboticVoiceFilterLevel = 6;
+}
+
+enum TTSType {
+  TTS_TYPE_STANDARD = 0;
+  TTS_TYPE_ADVANCED = 1;
+}
+
+enum Gender {
+  VOICE_GENDER_UNSPECIFIED = 0;
+  VOICE_GENDER_MALE = 1;
+  VOICE_GENDER_FEMALE = 2;
+  VOICE_GENDER_NEUTRAL = 3;
+}

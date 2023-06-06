@@ -1,0 +1,256 @@
+syntax = "proto3";
+package ai.inworld.engine;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+import "voices.proto";
+import "packets.proto";
+
+service WorldEngine {
+  rpc session(stream ai.inworld.packets.InworldPacket) returns (stream ai.inworld.packets.InworldPacket);
+  rpc createWorld(CreateWorldRequest) returns (CreateWorldResponse);
+  rpc loadScene(LoadSceneRequest) returns (LoadSceneResponse);
+  rpc logError(LogErrorRequest) returns (google.protobuf.Empty);
+  rpc voicePreview(VoicePreviewRequest) returns (VoicePreviewResponse);
+  rpc listBaseVoices(ListBaseVoicesRequest) returns (ListBaseVoicesResponse);
+  rpc generateToken(GenerateTokenRequest) returns (AccessToken);
+  rpc pingCharacter(PingCharacterRequest) returns (google.protobuf.Empty);
+  rpc createInteractionFeedback(CreateInteractionFeedbackRequest) returns (google.protobuf.Empty);
+}
+
+message InteractionFeedback {
+  bool isLike = 1;
+  repeated InteractionDislikeType typeList = 2;
+  string comment = 3;
+}
+
+message CreateInteractionFeedbackRequest {
+  string parent = 1;
+  optional InteractionFeedback feedback = 2;
+}
+
+message PingCharacterRequest {
+  string name = 1;
+}
+
+message CapabilitiesRequest {
+  bool audio = 1;
+  bool text = 2;
+  bool gestures = 3;
+  bool interruptions = 4;
+  bool triggers = 5;
+  bool emotions = 6;
+  bool animations = 7;
+  bool turnBasedStt = 8;
+  bool emotionStreaming = 9;
+  bool silenceEvents = 10;
+  bool phonemeInfo = 11;
+  bool continuation = 12;
+  bool sessionCancellation = 13;
+  bool narratedAction = 14;
+  bool regenerateResponse = 15;
+  bool loadSceneInSession = 16;
+}
+
+message UserRequest {
+  string name = 1;
+  string id = 2;
+}
+
+message ClientRequest {
+  string id = 1;
+  string version = 2;
+}
+
+message CreateWorldRequest {
+  string protoWorldName = 1;
+  repeated CreateAgentRequest createAgentRequestsList = 2;
+  optional CapabilitiesRequest capabilities = 3;
+  optional UserRequest user = 4;
+  optional ClientRequest client = 5; // the source puts the message as CreateWorldRequest.ClientRequest, but i dont think thats needed
+
+  message CreateAgentRequest {
+    string brainName = 1;
+    string languageCode = 2;
+    VoicePreset voicePreset = 3;
+  }
+}
+
+message CreateWorldResponse {
+  repeated Agent agentsList = 1;
+  string key = 3;
+
+  message Agent {
+    string agentId = 1;
+    string brainName = 2;
+  }
+}
+
+message LoadSceneRequest {
+  string name = 1;
+  optional CapabilitiesRequest capabilities = 2;
+  optional UserRequest user = 3;
+  optional ClientRequest client = 4;
+  optional AudioSettings audioSettings = 5;
+  optional UserSettings userSettings = 6;
+  optional SessionContinuation sessionContinuation = 7;
+}
+
+message AudioSettings {
+  uint32 sttSampleRateHertz = 1;
+  uint32 ttsSampleRateHertz = 2;
+}
+
+message UserSettings {
+  bool viewTranscriptContent = 1;
+}
+
+message SessionContinuation {
+  ContinuationInfo continuationInfo = 1;
+  PreviousDialog previousDialog = 2;
+  bytes previousState = 3;
+
+  message ContinuationInfo {
+    int64 millisPassed = 1;
+  }
+}
+
+message PreviousDialog {
+  repeated Phrase phrasesList = 1;
+
+  message Phrase {
+    DialogParticipant talker = 1;
+    string phrase = 2;
+  }
+
+  enum DialogParticipant {
+    UNKNOWN = 0;
+    PLAYER = 1;
+    CHARACTER = 2;
+  }
+}
+
+message PreviousState {
+  repeated StateHolder stateHolderList = 1;
+
+  message StateHolder {
+    string brainName = 1;
+    bytes state = 2;
+    optional PreviousDialog previousDialog = 3;
+    repeated ai.inworld.packets.InworldPacket packetList = 4;
+  }
+}
+
+message LoadSceneResponse {
+  repeated Agent agentsList = 1;
+  string key = 2;
+  optional string previousState = 3;
+
+  message Agent {
+    string agentId = 1;
+    string brainName = 2;
+    string givenNAme = 3;
+    CharacterAssets characterAssets = 4;
+
+    message CharacterAssets {
+      string rpmModelUri = 1;
+      string rpmImageUriPortrait = 2;
+      string rpmImageUriPosture = 3;
+      string avatarImg = 4;
+      string avatarImgOriginal = 5;
+    }
+  }
+}
+
+message LogErrorRequest {
+  string key = 1;
+  string message = 2;
+}
+
+message VoicePreviewRequest {
+  string text = 1;
+  optional ai.inworld.packets.EmotionEvent emotions = 2;
+  optional ai.inworld.voices.Voice voice = 3;
+}
+
+message VoicePreviewResponse {
+  bytes audio = 1;
+}
+
+message ListBaseVoicesRequest {
+  string languageCode = 1;
+  repeated ai.inworld.voices.TTSType ttsTypesList = 2;
+}
+
+message ListBaseVoicesResponse {
+  repeated BaseVoice googlevoicesList = 1;
+  repeated BaseVoice inworldvoicesList = 2;
+
+  message BaseVoice {
+    repeated string languageCodeList = 1;
+    string name = 2;
+    ai.inworld.voices.Gender gender = 3;
+    int32 naturalsamplerhertz = 4;
+  }
+}
+
+message AccessToken {
+  string token = 1;
+  string type = 2;
+  optional google.protobuf.Timestamp expirationTime = 3;
+  string sessionId = 4;
+}
+
+message GenerateTokenRequest {
+  string key = 1;
+}
+
+enum InteractionDislikeType {
+  DISLIKE_TYPE_UNSPECIFIED = 0;
+  DISLIKE_TYPE_IRRELEVANT = 1;
+  DISLIKE_TYPE_UNSAFE = 2;
+  DISLIKE_TYPE_UNTRUE = 3;
+  DISLIKE_TYPE_INCORRECT_USE_KNOWLEDGE = 4;
+  DISLIKE_TYPE_UNEXPECTED_ACTION = 5;
+  DISLIKE_TYPE_UNEXPECTED_GOAL_BEHAVIOR = 6;
+  DISLIKE_TYPE_REPETITION = 7;
+}
+
+enum VoicePreset {
+  VOICE_PRESET_UNSPECIFIED = 0;
+  VOICE_PRESET_FEMALE_1 = 1;
+  VOICE_PRESET_FEMALE_2 = 2;
+  VOICE_PRESET_FEMALE_3 = 3;
+  VOICE_PRESET_FEMALE_4 = 4;
+  VOICE_PRESET_FEMALE_5 = 5;
+  VOICE_PRESET_MALE_1 = 6;
+  VOICE_PRESET_MALE_2 = 7;
+  VOICE_PRESET_MALE_3 = 8;
+  VOICE_PRESET_MALE_4 = 9;
+  VOICE_PRESET_MALE_5 = 10;
+  INWORLD_VOICE_PRESET_MALE_1 = 11;
+  INWORLD_VOICE_PRESET_MALE_2 = 12;
+  INWORLD_VOICE_PRESET_FEMALE_1 = 13;
+  INWORLD_VOICE_PRESET_FEMALE_2 = 14;
+  INWORLD_VOICE_PRESET_MALE_3 = 15;
+  INWORLD_VOICE_PRESET_MALE_4 = 16;
+  INWORLD_VOICE_PRESET_MALE_5 = 17;
+  INWORLD_VOICE_PRESET_FEMALE_3 = 18;
+  INWORLD_VOICE_PRESET_FEMALE_4 = 19;
+  INWORLD_VOICE_PRESET_ROBOT_MALE_1 = 20;
+  INWORLD_VOICE_PRESET_ROBOT_MALE_2 = 21;
+  INWORLD_VOICE_PRESET_ROBOT_MALE_3 = 22;
+  INWORLD_VOICE_PRESET_ROBOT_MALE_4 = 23;
+  INWORLD_VOICE_PRESET_ROBOT_MALE_5 = 24;
+  INWORLD_VOICE_PRESET_ROBOT_FEMALE_1 = 25;
+  INWORLD_VOICE_PRESET_ROBOT_FEMALE_2 = 26;
+  INWORLD_VOICE_PRESET_ROBOT_FEMALE_3 = 27;
+  INWORLD_VOICE_PRESET_ROBOT_FEMALE_4 = 28;
+  INWORLD_VOICE_PRESET_SPIKE = 29;
+  INWORLD_VOICE_PRESET_TWILIGHT = 30;
+  INWORLD_VOICE_PRESET_FLUTTERSHY = 31;
+  INWORLD_VOICE_PRESET_ROBOT_SPIKE = 32;
+  INWORLD_VOICE_PRESET_ROBOT_TWILIGHT = 33;
+  INWORLD_VOICE_PRESET_ROBOT_FLUTTERSHY = 34;
+}

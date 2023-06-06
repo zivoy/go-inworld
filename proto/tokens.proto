@@ -1,0 +1,26 @@
+syntax = "proto3";
+package ai.inworld.studio.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+
+//import "options.proto"; todo missing something
+
+service Tokens {
+  rpc generateSessionToken(GenerateSessionTokenRequest) returns (SessionAccessToken);
+  rpc generateDefaultSessionToken(GenerateDefaultSessionTokenRequest) returns (SessionAccessToken);
+}
+
+message SessionAccessToken {
+  string token = 1;
+  string type = 2;
+  optional google.protobuf.Timestamp expirationTime = 3;
+  string sessionId = 4;
+}
+
+message GenerateSessionTokenRequest {
+  string key = 1;
+}
+
+message GenerateDefaultSessionTokenRequest {
+  string parent = 1;
+}

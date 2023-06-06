@@ -1,0 +1,13 @@
+syntax = "proto3";
+package ai.inworld.options;
+
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/struct.proto";
+
+message ExampleValue {
+  repeated google.protobuf.Struct exampleList = 1;
+}
+
+extend google.protobuf.FieldOptions {
+    ExampleValue examples = 70900;
+}
