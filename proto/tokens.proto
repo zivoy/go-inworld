@@ -1,6 +1,8 @@
 syntax = "proto3";
 package ai.inworld.studio.v1alpha;
 
+option go_package = "github.com/zivoy/go-inworld/protoBuf/studioTokens";
+
 import "google/protobuf/timestamp.proto";
 
 //import "options.proto"; todo missing something

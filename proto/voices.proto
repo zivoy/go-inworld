@@ -1,6 +1,8 @@
 syntax = "proto3";
 package ai.inworld.voices;
 
+option go_package = "github.com/zivoy/go-inworld/protoBuf/voices";
+
 message Voice {
   string basename = 1;
   TTSType ttsType = 2;

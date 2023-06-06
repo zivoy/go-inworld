@@ -1,6 +1,8 @@
 syntax = "proto3";
 package ai.inworld.engine;
 
+option go_package = "github.com/zivoy/go-inworld/protoBuf/engine";
+
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 

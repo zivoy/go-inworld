@@ -1,6 +1,8 @@
 syntax = "proto3";
 package ai.inworld.options;
 
+option go_package = "github.com/zivoy/go-inworld/protoBuf/options";
+
 import "google/protobuf/descriptor.proto";
 import "google/protobuf/struct.proto";
 
