@@ -5,7 +5,7 @@ import (
 	"errors"
 	goinworld "github.com/zivoy/go-inworld"
 	"github.com/zivoy/go-inworld/internal/auth"
-	"github.com/zivoy/go-inworld/protoBuf/studioTokens"
+	"github.com/zivoy/go-inworld/internal/protoBuf/studioTokens"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

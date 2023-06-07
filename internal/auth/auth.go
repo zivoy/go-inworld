@@ -6,11 +6,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	goinworld "github.com/zivoy/go-inworld"
 	"strings"
 	"time"
 )
 
-func GetAuthorization(host string, apiKey ApiKey) (string, error) {
+func GetAuthorization(host string, apiKey goinworld.ApiKey) (string, error) {
 	host = strings.Replace(host, ":443", "", 1)                            // should be -1 since there is a chance for it different from the js version
 	const method = "ai.inworld.studio.v1alpha.Tokens/GenerateSessionToken" //cant get it from the proto file like in the js version, so i am also not bothering slicing it
 

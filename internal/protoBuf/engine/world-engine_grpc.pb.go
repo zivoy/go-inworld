@@ -8,7 +8,7 @@ package engine
 
 import (
 	context "context"
-	packets "github.com/zivoy/go-inworld/protoBuf/packets"
+	packets "github.com/zivoy/go-inworld/internal/protoBuf/packets"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

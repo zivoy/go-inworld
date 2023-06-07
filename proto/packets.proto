@@ -1,7 +1,7 @@
 syntax = "proto3";
 package ai.inworld.packets;
 
-option go_package = "github.com/zivoy/go-inworld/protoBuf/packets";
+option go_package = "github.com/zivoy/go-inworld/internal/protoBuf/packets";
 
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
