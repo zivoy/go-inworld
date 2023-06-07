@@ -1,4 +1,4 @@
-package goinworld
+package auth
 
 import (
 	"crypto/hmac"
