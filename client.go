@@ -2,7 +2,7 @@ package goinworld
 
 import (
 	"errors"
-	"github.com/zivoy/go-inworld/protoBuf/engine"
+	"github.com/zivoy/go-inworld/internal/protoBuf/engine"
 )
 
 type InworldClient struct {

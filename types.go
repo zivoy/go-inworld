@@ -2,7 +2,7 @@ package goinworld
 
 import (
 	"github.com/zivoy/go-inworld/entities"
-	"github.com/zivoy/go-inworld/protoBuf/engine"
+	"github.com/zivoy/go-inworld/internal/protoBuf/engine"
 	"time"
 )
 

@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"github.com/zivoy/go-inworld/protoBuf/studioTokens"
+	"github.com/zivoy/go-inworld/internal/protoBuf/studioTokens"
 	"time"
 )
 
