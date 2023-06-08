@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	goinworld "github.com/zivoy/go-inworld"
 	"log"
 	"net/http"
 	"os"
@@ -26,8 +27,7 @@ func init() {
 }
 
 var (
-	Key               string
-	Secret            string
+	ApiKey            *goinworld.ApiKey
 	Scene             string
 	DisconnectTimeout = 30 * time.Minute
 	Emotions          = true
@@ -74,15 +74,16 @@ func main() {
 }
 
 func loadConfigs() {
+	ApiKey = new(goinworld.ApiKey)
 	if v := viper.GetString("INWORLD_KEY"); v == "" {
 		log.Fatal("Inworld API Key not set")
 	} else {
-		Key = v
+		ApiKey.Key = v
 	}
 	if v := viper.GetString("INWORLD_SECRET"); v == "" {
 		log.Fatal("Inworld API Secret not set")
 	} else {
-		Secret = v
+		ApiKey.Secret = v
 	}
 	if v := viper.GetString("INWORLD_SCENE"); v == "" {
 		log.Fatal("Inworld API Default Scene not set")

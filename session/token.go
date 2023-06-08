@@ -1,4 +1,4 @@
-package entities
+package session
 
 import (
 	"github.com/zivoy/go-inworld/internal/protoBuf/studioTokens"
@@ -7,15 +7,15 @@ import (
 
 const ExpirationDelta = 5 * time.Minute
 
-type SessionToken struct {
+type Token struct {
 	Token          string
 	Type           string
 	ExpirationTime time.Time
 	SessionId      string
 }
 
-func SessionTokenFromProto(proto *studioTokens.SessionAccessToken) *SessionToken {
-	return &SessionToken{
+func TokenFromProto(proto *studioTokens.SessionAccessToken) *Token {
+	return &Token{
 		Token:          proto.GetToken(),
 		Type:           proto.GetType(),
 		ExpirationTime: proto.GetExpirationTime().AsTime(),
@@ -23,6 +23,6 @@ func SessionTokenFromProto(proto *studioTokens.SessionAccessToken) *SessionToken
 	}
 }
 
-func (s *SessionToken) IsExpired() bool {
+func (s *Token) IsExpired() bool {
 	return s.ExpirationTime.Sub(time.Now()).Abs() <= ExpirationDelta
 }

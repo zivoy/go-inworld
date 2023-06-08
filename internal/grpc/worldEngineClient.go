@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	goinworld "github.com/zivoy/go-inworld"
-	"github.com/zivoy/go-inworld/entities"
 	"github.com/zivoy/go-inworld/internal/protoBuf/engine"
 	"github.com/zivoy/go-inworld/internal/protoBuf/packets"
+	"github.com/zivoy/go-inworld/session"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"io"
@@ -49,14 +49,14 @@ func (c *WorldClient) Close() error {
 	return c.conn.Close()
 }
 
-func (c *WorldClient) addMetadata(ctx context.Context, token *entities.SessionToken) {
+func (c *WorldClient) addMetadata(ctx context.Context, token *session.Token) {
 	metadata.AppendToOutgoingContext(ctx,
 		"session-id", token.SessionId,
 		"authorization", fmt.Sprintf("%s %s", token.Type, token.Token))
 }
 
 func (c *WorldClient) LoadScene(ctx context.Context,
-	name string, token *entities.SessionToken, user *engine.UserRequest, capabilities *engine.CapabilitiesRequest, client *engine.ClientRequest) (*engine.LoadSceneResponse, error) {
+	name string, token *session.Token, user *engine.UserRequest, capabilities *engine.CapabilitiesRequest, client *engine.ClientRequest) (*engine.LoadSceneResponse, error) {
 	if c.conn == nil {
 		return nil, errors.New("not connected")
 	}

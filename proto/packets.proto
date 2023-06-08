@@ -53,7 +53,7 @@ message InworldPacket {
 message TextEvent {
   string text = 1;
   SourceType sourceType = 2;
-  bool pb_final = 3;
+  bool final = 3;
 
   enum SourceType {
     UNKNOWN = 0;
