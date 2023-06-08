@@ -1,4 +1,4 @@
-# go inworld.ai client
+# go Inworld.AI client library
 unofficial inworld client / sdk written in go 
 
 wip
