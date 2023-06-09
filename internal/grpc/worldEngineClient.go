@@ -75,8 +75,9 @@ func (c *WorldClient) LoadScene(ctx context.Context,
 	})
 }
 
-func (c *WorldClient) Scene(ctx context.Context) (*BilateralWorldSession, error) {
-	session, err := c.client.Session(ctx)
+func (c *WorldClient) Session(ctx context.Context, token *session.Token) (*BilateralWorldSession, error) {
+	c.addMetadata(ctx, token)
+	sess, err := c.client.Session(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func (c *WorldClient) Scene(ctx context.Context) (*BilateralWorldSession, error)
 	ses := &BilateralWorldSession{
 		Incoming: make(chan *packets.InworldPacket),
 		Done:     make(chan error),
-		session:  session,
+		session:  sess,
 	}
 
 	go ses.startListening()

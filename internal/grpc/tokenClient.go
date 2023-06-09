@@ -36,7 +36,7 @@ func (c *TokenClient) Close() error {
 	return c.conn.Close()
 }
 
-func (c *TokenClient) GenerateSessionToken(ctx context.Context, key goinworld.ApiKey) (*studioTokens.SessionAccessToken, error) {
+func (c *TokenClient) GenerateSessionToken(ctx context.Context, key *goinworld.ApiKey) (*studioTokens.SessionAccessToken, error) {
 	if c.conn == nil {
 		return nil, errors.New("not connected")
 	}

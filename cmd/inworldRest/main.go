@@ -86,7 +86,7 @@ func loadConfigs() {
 		ApiKey.Secret = v
 	}
 	if v := viper.GetString("INWORLD_SCENE"); v == "" {
-		log.Fatal("Inworld API Default Scene not set")
+		log.Fatal("Inworld API Default Session not set")
 	} else {
 		Scene = v
 	}
