@@ -10,7 +10,7 @@ type InworldClient struct {
 	user   *engine.UserRequest
 	scene  string
 	client *engine.ClientRequest
-	config *ClientConfiguration
+	config *ClientConfig
 
 	generateSessionTokenFunc GenerateSessionTokenFunc
 }

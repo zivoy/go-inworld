@@ -35,6 +35,18 @@ func (g *Generator) NewDataChunkPacket(data []byte, dataType packets.DataChunk_D
 	return packet
 }
 
+func (g *Generator) NewTriggerPacket(name string, parameters []*packets.CustomEvent_Parameter) *packets.InworldPacket {
+	packet := g.NewBasePacket(false, false)
+	packet.Packet = &packets.InworldPacket_Custom{
+		Custom: &packets.CustomEvent{
+			Name:           name,
+			ParametersList: parameters,
+		},
+	}
+
+	return packet
+}
+
 //todo other packet types
 
 func (g *Generator) NewBasePacket(utteranceId, interactionId bool) *packets.InworldPacket {

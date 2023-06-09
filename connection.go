@@ -21,7 +21,7 @@ const (
 
 type Connection struct {
 	state  connectionState
-	config *ClientConfiguration
+	config *ClientConfig
 	apiKey *ApiKey
 
 	Session *session.Session
@@ -31,9 +31,15 @@ type Connection struct {
 	tokenClient  *grpc.TokenClient
 	engineClient *grpc.WorldClient
 	stream       *grpc.BilateralWorldSession
-	queue        internal.Queue[packets.InworldPacket]
+	queue        internal.Queue[*packets.InworldPacket]
 
-	EventGenerator *grpc.Generator
+	done        chan interface{}
+	messageSent chan interface{}
+
+	eventGenerator *grpc.Generator
+	OnDisconnect   func()
+	OnError        func(err error)
+	OnMessage      func(packet *InworldPacket)
 }
 
 func NewConnection() *Connection { //todo
@@ -68,10 +74,19 @@ func (c *Connection) openManually(ctx context.Context) error {
 	return c.Open(ctx)
 }
 
-func (c *Connection) Close() error {
-	c.cancelTimeout()
+func (c *Connection) Close() {
+	c.done <- true
 	c.state = connectionInactive
-	//todo
+	err := c.stream.Stop()
+	if err != nil {
+		c.OnError(err)
+	}
+	c.stream = nil
+	c.queue.Clear()
+
+	if c.OnDisconnect != nil {
+		c.OnDisconnect()
+	}
 }
 
 func (c *Connection) GetCharactersList() []*session.Character {
@@ -95,14 +110,40 @@ func (c *Connection) Open(ctx context.Context) error {
 		}
 		// todo handle incoming data somehow
 
-		c.state = connectionInactive
+		c.state = connectionActive
 		// todo send data in queue
 		// todo start timeout
 	}
 
+	go c.startListener()
 }
 
-func (c *Connection) Send(packet *packets.InworldPacket) error {
+func (c *Connection) startListener() {
+	for {
+		select {
+		case <-c.done:
+			return
+
+		case err := <-c.stream.Done:
+			if err != nil {
+				go c.OnError(err)
+			}
+			go c.Close()
+
+		case message := <-c.stream.Incoming:
+			if c.OnMessage != nil {
+				go c.OnMessage(getMessageFromProto(message))
+			}
+		}
+	}
+}
+
+func (c *Connection) send(packet *packets.InworldPacket) error {
+	if c.stream == nil {
+		c.queue.Append(packet)
+		return nil
+	}
+	return c.stream.Send(packet)
 	//todo also write function will be part of send
 }
 
@@ -112,3 +153,30 @@ func (c *Connection) loadScene() {
 	}
 	//todo
 }
+
+////
+
+func (c *Connection) SetCurrentCharacter(characterId string) {
+	c.eventGenerator.TargetId = characterId
+}
+
+func (c *Connection) SendText(text string) error {
+	return c.send(c.eventGenerator.NewTextPacket(text))
+}
+func (c *Connection) SendAudio(chunk []byte) error {
+	return c.send(c.eventGenerator.NewDataChunkPacket(chunk, packets.DataChunk_AUDIO))
+}
+
+func (c *Connection) SendTrigger(name string, parameters ...TriggerParameter) error {
+	params := make([]*packets.CustomEvent_Parameter, len(parameters))
+	for i, parameter := range parameters {
+		params[i] = &packets.CustomEvent_Parameter{
+			Name:  parameter.Name,
+			Value: parameter.Value,
+		}
+	}
+
+	return c.send(c.eventGenerator.NewTriggerPacket(name, params))
+}
+
+//todo other events

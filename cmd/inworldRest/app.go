@@ -35,7 +35,7 @@ func (a *Application) OpenSession(request *OpenSessionRequest) (*OpenSessionResp
 	log.Printf("opening session uid:%s sceneId:%s characterId:%s playerName:%s serverId%s\n",
 		request.Uid, request.SceneId, request.CharacterId, request.PlayerName, request.ServerId)
 
-	ses := session.NewSession(&goinworld.ClientConfiguration{
+	ses := session.NewSession(&goinworld.ClientConfig{
 		Connection: &goinworld.ConnectionConfig{
 			AutoReconnect:    false,
 			DisconnectTimout: DisconnectTimeout,

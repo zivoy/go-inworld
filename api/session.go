@@ -20,7 +20,7 @@ type Session struct {
 	OnMessage    func(packet packets.InworldPacket) // todo maybe move the packets type out of internal
 }
 
-func NewSession(config *goinworld.ClientConfiguration, apiKey *goinworld.ApiKey,
+func NewSession(config *goinworld.ClientConfig, apiKey *goinworld.ApiKey,
 	uid, sceneId, characterId, playerName, serverId string) *Session {
 
 }

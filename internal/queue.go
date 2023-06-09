@@ -14,21 +14,16 @@ type Queue[T any] struct {
 	mu sync.Mutex
 }
 
-// NewPointer is a helper for making pointers to stuff like numbers
-func NewPointer[T any](v T) *T {
-	return &v
-}
-
 type queueElm[T any] struct {
 	next *queueElm[T]
-	data *T
+	data T
 }
 
 func NewQueue[T any]() *Queue[T] {
 	return &Queue[T]{}
 }
 
-func (q *Queue[T]) Append(data *T) {
+func (q *Queue[T]) Append(data T) {
 	e := &queueElm[T]{
 		data: data,
 	}
@@ -46,9 +41,9 @@ func (q *Queue[T]) Append(data *T) {
 	q.last = e
 }
 
-func (q *Queue[T]) Pop() *T {
+func (q *Queue[T]) Pop() T {
 	if q.queue == nil {
-		return nil
+		return *new(T) // probably not the best way to signify empty
 	}
 	q.mu.Lock()
 	defer q.mu.Unlock()
