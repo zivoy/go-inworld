@@ -76,7 +76,7 @@ type ConnectionConfig struct {
 type GenerateSessionTokenFunc = func() func(token session.Token)
 
 type InworldPacket struct {
-	packetType InworldPacketType
+	PacketType InworldPacketType
 
 	Date     time.Time
 	PacketId *PacketId

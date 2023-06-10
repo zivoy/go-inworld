@@ -1,5 +1,7 @@
 package main
 
+import "github.com/zivoy/go-inworld/session"
+
 type OpenSessionRequest struct {
 	Uid         string `json:"uid" binding:"required"`
 	SceneId     string `json:"sceneId" binding:"required"`
@@ -18,4 +20,12 @@ type Character struct {
 	Id           string `json:"id"`
 	ResourceName string `json:"resourceName"`
 	DisplayName  string `json:"displayName"`
+}
+
+func CharacterFromSession(char *session.Character) *Character {
+	return &Character{
+		Id:           char.Id,
+		ResourceName: char.ResourceName,
+		DisplayName:  char.DisplayName,
+	}
 }

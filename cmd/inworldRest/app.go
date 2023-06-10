@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	goinworld "github.com/zivoy/go-inworld"
+	"github.com/zivoy/go-inworld/api"
 	"github.com/zivoy/go-inworld/internal/protoBuf/engine"
-	"github.com/zivoy/go-inworld/session"
 	"log"
 	"sync"
 )
@@ -12,7 +12,7 @@ import (
 var app *Application
 
 type Application struct {
-	Sessions  map[string]*session.Session
+	Sessions  map[string]*api.Session
 	sessionMu sync.RWMutex
 }
 
@@ -22,7 +22,7 @@ func GetApp() *Application {
 	}
 
 	app = &Application{
-		Sessions: make(map[string]*session.Session, 0),
+		Sessions: make(map[string]*api.Session, 0),
 	}
 	return app
 }
@@ -35,7 +35,7 @@ func (a *Application) OpenSession(request *OpenSessionRequest) (*OpenSessionResp
 	log.Printf("opening session uid:%s sceneId:%s characterId:%s playerName:%s serverId%s\n",
 		request.Uid, request.SceneId, request.CharacterId, request.PlayerName, request.ServerId)
 
-	ses := session.NewSession(&goinworld.ClientConfig{
+	ses := api.NewSession(&goinworld.ClientConfig{
 		Connection: &goinworld.ConnectionConfig{
 			AutoReconnect:    false,
 			DisconnectTimout: DisconnectTimeout,
@@ -48,15 +48,19 @@ func (a *Application) OpenSession(request *OpenSessionRequest) (*OpenSessionResp
 
 	character := ses.GetCharacter()
 	characters := ses.GetCharacters()
+	chars := make([]*Character, len(characters))
+	for i, s := range characters {
+		chars[i] = CharacterFromSession(s)
+	}
 
 	return &OpenSessionResponse{
 		SessionId:  ses.GetSessionId(),
-		Character:  character,
-		Characters: characters,
+		Character:  CharacterFromSession(character),
+		Characters: chars,
 	}, nil
 }
 
-func (a *Application) findSession(uid, characterId, sceneId, serverId string) (*session.Session, bool) {
+func (a *Application) findSession(uid, characterId, sceneId, serverId string) (*api.Session, bool) {
 	a.sessionMu.RLock()
 	defer a.sessionMu.RUnlock()
 
@@ -64,7 +68,7 @@ func (a *Application) findSession(uid, characterId, sceneId, serverId string) (*
 		if ses.GetUid() == uid &&
 			ses.GetCharacterId() == characterId &&
 			ses.GetSceneId() == sceneId &&
-			ses.GetServerId() == serverId { // also works for the case where its not present
+			ses.GetServerId() == serverId { // also works for the case where it's not present
 			return ses, true
 		}
 	}

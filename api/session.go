@@ -8,7 +8,7 @@ import (
 
 type Session struct {
 	client      *goinworld.InworldClient
-	connection  *goinworld.Connection
+	connection  *session.Connection
 	characterId string
 	sceneId     string
 	sessionId   string
@@ -31,9 +31,9 @@ func (s *Session) GetSceneId() string     { return s.sceneId }
 func (s *Session) GetServerId() string    { return s.serverId }
 func (s *Session) GetSessionId() string   { return s.sessionId }
 
-func (s *Session) GetCharacter() session.Character { //todo
+func (s *Session) GetCharacter() *session.Character { //todo
 	//if this
 	//s.connection
 }
-func (s *Session) GetCharacters() { //todo
+func (s *Session) GetCharacters() []*session.Character { //todo
 }
